@@ -1,0 +1,18 @@
+.main-container {
+  background-image: linear-gradient(to right, lightblue, rgb(200, 255, 0));
+  height: 100vh;
+  width: 100vw;
+}
+
+.sub-container {
+  display: flex;
+  justify-content: center;
+}
+
+.connectbtn {
+  margin-top: 50vh;
+  font-size: 24px;
+  padding: 10px;
+  color: green;
+  font-weight: 800;
+}

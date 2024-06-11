@@ -1,0 +1,38 @@
+.main-container {
+  background-image: linear-gradient(to right, lightblue, rgb(200, 255, 0));
+  height: 100vh;
+  width: 100vw;
+  color: green;
+  font-size: 30px;
+  text-align: center;
+}
+.sub-section {
+  display: flex;
+  flex-direction: column;
+  padding-top: 36vh;
+}
+.form-control {
+  padding: 5px;
+  font-size: 20px;
+  color: green;
+}
+.button {
+  font-size: 20px;
+  color: green;
+}
+
+.unStake-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.claim-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
