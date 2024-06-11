@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Web3 from "web3";
 import { ethers } from "ethers";
 import contract from "../utils/contract";
@@ -28,6 +29,8 @@ const Home = () => {
       FetchStakedEther();
       FetchClaimAbleToken();
       setInterval(function () {
+        FetchETHBalance();
+        FetchStakedEther();
         FetchClaimAbleToken();
       }, 5000);
     }
@@ -90,25 +93,29 @@ const Home = () => {
   };
 
   const StakeEther = async () => {
-    const StakingContract = new Web3Instance.eth.Contract(
-      stakingabi,
-      contract.Staking[1]
-    );
-    const weiAmount = Web3Instance.utils.toWei(ETH_amount, "ether"); // Convert 0.1 Ether to Wei
+    if (ETH_amount == 0) {
+      toast("Can't Stake with 0 ETH!");
+    } else {
+      const StakingContract = new Web3Instance.eth.Contract(
+        stakingabi,
+        contract.Staking[1]
+      );
+      const weiAmount = Web3Instance.utils.toWei(ETH_amount, "ether"); // Convert 0.1 Ether to Wei
 
-    const stakeAmount = Web3Instance.utils.toBN(weiAmount); // Convert to BigNumber
-    try {
-      StakingContract.methods
-        .stake()
-        .send({ from: MyAccount, value: stakeAmount })
-        .then((e) => {
-          console.log("Staked Successfully!");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } catch (error) {
-      console.log(error, "error");
+      const stakeAmount = Web3Instance.utils.toBN(weiAmount); // Convert to BigNumber
+      try {
+        StakingContract.methods
+          .stake()
+          .send({ from: MyAccount, value: stakeAmount })
+          .then((e) => {
+            toast(`${ETH_amount} Staked Successfully!`);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.log(error, "error");
+      }
     }
   };
 
@@ -122,7 +129,7 @@ const Home = () => {
         .unstake()
         .send({ from: MyAccount })
         .then((e) => {
-          console.log("UnStaked Successfully!");
+          toast(`${StakedAmount} UnStaked Successfully!`);
         })
         .catch((err) => {
           console.log(err);
@@ -142,7 +149,7 @@ const Home = () => {
         .claimReward()
         .send({ from: MyAccount })
         .then((e) => {
-          console.log("UnStaked Successfully!");
+          toast(`${claimAbleAmount} Claimed Successfully!`);
         })
         .catch((err) => {
           console.log(err);
@@ -154,6 +161,7 @@ const Home = () => {
 
   return (
     <div className="main-container">
+      <ToastContainer />
       <div className="sub-section">
         {MyAccount === "Connect Wallet" ? (
           <div>
