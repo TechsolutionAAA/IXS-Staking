@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import "./Home.css";
+
 const Home = () => {
   const [MyAccount, setMyAccount] = useState("");
 
+  // connect metamask
   const connectMetamask = async () => {
+    // exisiting ethereum from window
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
-      const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      console.log(chainId);
+      const chainId = await window.ethereum.request({ method: "eth_chainId" }); // get current connected eth chain id
+
       if (chainId !== "0xAA36A7") {
+        // switch network as sepolia one
         try {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
@@ -33,11 +37,15 @@ const Home = () => {
             }
           }
         }
-        window.ethereum.on("chainChanged", handleChainChanged);
-        function handleChainChanged(_chainId) {
+
+        window.ethereum.on("chainChanged", handleAfterChainChanged);
+
+        const handleAfterChainChanged = (_chainId) => {
           window.location.reload();
-        }
+        };
       }
+
+      // wallet connect
       await window.ethereum
         .enable()
         .then((result) => {
@@ -46,7 +54,7 @@ const Home = () => {
           if (typeof result !== "undefined" && result.length > 0) {
             setMyAccount(str);
             localStorage.setItem("addr", str);
-            window.location.assign("/about");
+            window.location.assign("/staking");
           }
         })
         .catch((err) => {

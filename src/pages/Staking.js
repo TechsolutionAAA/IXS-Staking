@@ -5,17 +5,18 @@ import Web3 from "web3";
 import { ethers } from "ethers";
 import contract from "../utils/contract";
 import stakingabi from "../utils/staking.json";
-import "./About.css";
+import "./staking.css";
 
-const Home = () => {
-  const [MyAccount, setMyAccount] = useState("");
+const Staking = () => {
+  const [myAccount, setMyAccount] = useState("");
   const [Web3Instance, setWeb3Instance] = useState([]);
-  const [ETH_balance, setETH_balance] = useState(0);
-  const [ETH_amount, setETH_amount] = useState(0);
+  const [ethBalance, setEthBalance] = useState(0);
+  const [ethAmount, setEthAmount] = useState(0);
 
   const [StakedAmount, setStakedAmount] = useState(0);
   const [claimAbleAmount, SetclaimAbleAmount] = useState(0);
 
+  // check the wallet connecting status
   useEffect(() => {
     setMyAccount(localStorage.getItem("addr"));
     if (window.web3 !== undefined && window.ethereum) {
@@ -34,22 +35,25 @@ const Home = () => {
         FetchClaimAbleToken();
       }, 5000);
     }
-  }, [Web3Instance, MyAccount]);
+  }, [Web3Instance, myAccount]);
 
+  // load the wallet instance
   const loadWeb3 = async () => {
     const Web3Instance = await new Web3(window.ethereum);
     setWeb3Instance(Web3Instance);
   };
 
+  // get the wallet Ethereum Balance
   const FetchETHBalance = async () => {
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const balance = await signer.getBalance();
     console.log(`Balance: ${ethers.utils.formatEther(balance)} ETH`);
-    setETH_balance(ethers.utils.formatEther(balance));
+    setEthBalance(ethers.utils.formatEther(balance));
   };
 
+  // get the staked Ethereum
   const FetchStakedEther = async () => {
     const StakingContract = new Web3Instance.eth.Contract(
       stakingabi,
@@ -57,7 +61,7 @@ const Home = () => {
     );
     try {
       StakingContract.methods
-        .stakingBalance(MyAccount)
+        .stakingBalance(myAccount)
         .call()
         .then((e) => {
           console.log("Staked Successfully!", e / 10 ** 18);
@@ -71,6 +75,7 @@ const Home = () => {
     }
   };
 
+  // get the rewards ethereum balance
   const FetchClaimAbleToken = async () => {
     const StakingContract = new Web3Instance.eth.Contract(
       stakingabi,
@@ -78,7 +83,7 @@ const Home = () => {
     );
     try {
       StakingContract.methods
-        .getPendingReward(MyAccount)
+        .getPendingReward(myAccount)
         .call()
         .then((e) => {
           console.log("Staked Successfully!", e / 10 ** 18);
@@ -92,23 +97,24 @@ const Home = () => {
     }
   };
 
+  // stake the ethereum
   const StakeEther = async () => {
-    if (ETH_amount == 0) {
+    if (ethAmount == 0) {
       toast("Can't Stake with 0 ETH!");
     } else {
       const StakingContract = new Web3Instance.eth.Contract(
         stakingabi,
         contract.Staking[1]
       );
-      const weiAmount = Web3Instance.utils.toWei(ETH_amount, "ether"); // Convert 0.1 Ether to Wei
+      const weiAmount = Web3Instance.utils.toWei(ethAmount, "ether"); // Convert 0.1 Ether to Wei
 
       const stakeAmount = Web3Instance.utils.toBN(weiAmount); // Convert to BigNumber
       try {
         StakingContract.methods
           .stake()
-          .send({ from: MyAccount, value: stakeAmount })
+          .send({ from: myAccount, value: stakeAmount })
           .then((e) => {
-            toast(`${ETH_amount} Staked Successfully!`);
+            toast(`${ethAmount} Staked Successfully!`);
           })
           .catch((err) => {
             console.log(err);
@@ -119,6 +125,7 @@ const Home = () => {
     }
   };
 
+  // unstake
   const HandleUnstake = async () => {
     const StakingContract = new Web3Instance.eth.Contract(
       stakingabi,
@@ -127,7 +134,7 @@ const Home = () => {
     try {
       StakingContract.methods
         .unstake()
-        .send({ from: MyAccount })
+        .send({ from: myAccount })
         .then((e) => {
           toast(`${StakedAmount} UnStaked Successfully!`);
         })
@@ -139,6 +146,7 @@ const Home = () => {
     }
   };
 
+  // claim the rewards
   const HandleClaim = async () => {
     const StakingContract = new Web3Instance.eth.Contract(
       stakingabi,
@@ -147,7 +155,7 @@ const Home = () => {
     try {
       StakingContract.methods
         .claimReward()
-        .send({ from: MyAccount })
+        .send({ from: myAccount })
         .then((e) => {
           toast(`${claimAbleAmount} Claimed Successfully!`);
         })
@@ -163,15 +171,15 @@ const Home = () => {
     <div className="main-container">
       <ToastContainer />
       <div className="sub-section">
-        {MyAccount === "Connect Wallet" ? (
+        {myAccount === "Connect Wallet" ? (
           <div>
-            <div>Wallet Address: {MyAccount}</div>
-            <div>My Ether Balance: {ETH_balance} ETH</div>
+            <div>Wallet Address: {myAccount}</div>
+            <div>My Ether Balance: {ethBalance} ETH</div>
           </div>
         ) : (
           <div>
-            <div>Wallet Address: {MyAccount}</div>
-            <div>My Ether Balance: {ETH_balance} ETH</div>
+            <div>Wallet Address: {myAccount}</div>
+            <div>My Ether Balance: {ethBalance} ETH</div>
 
             <div
               style={{
@@ -189,8 +197,8 @@ const Home = () => {
                 <input
                   className="form-control"
                   type="text"
-                  value={ETH_amount}
-                  onChange={(e) => setETH_amount(e.target.value)}
+                  value={ethAmount}
+                  onChange={(e) => setEthAmount(e.target.value)}
                   placeholder="Enter your ETH amount for staking.."
                 />
                 <button className="button" onClick={() => StakeEther()}>
@@ -217,4 +225,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Staking;
