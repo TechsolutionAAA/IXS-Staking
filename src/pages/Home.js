@@ -3,8 +3,6 @@ import Web3 from "web3";
 import "./Home.css";
 
 const Home = () => {
-  const [MyAccount, setMyAccount] = useState("");
-
   // connect metamask
   const connectMetamask = async () => {
     // exisiting ethereum from window
@@ -40,9 +38,9 @@ const Home = () => {
 
         window.ethereum.on("chainChanged", handleAfterChainChanged);
 
-        const handleAfterChainChanged = (_chainId) => {
+        function handleAfterChainChanged(_chainId) {
           window.location.reload();
-        };
+        }
       }
 
       // wallet connect
@@ -52,7 +50,7 @@ const Home = () => {
           var str = result[0];
           console.log(str);
           if (typeof result !== "undefined" && result.length > 0) {
-            setMyAccount(str);
+            // set account address to storage
             localStorage.setItem("addr", str);
             window.location.assign("/staking");
           }
